@@ -76,7 +76,7 @@ export default function InflowLanding() {
           </div>
           <div className="flex items-center space-x-4">
             <a
-              href="#"
+              href="https://github.com/trickytoy/InFlow"
               className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors rounded-lg hover:bg-gray-50"
             >
               <Github className="w-4 h-4" />
@@ -437,7 +437,7 @@ export default function InflowLanding() {
 
             <div className="flex items-center space-x-8">
               <span className="text-gray-400">© 2024 Inflow. All rights reserved.</span>
-              <a href="#" className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+              <a href="https://github.com/trickytoy/InFlow" className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
                 <Github className="w-5 h-5" />
                 <span>GitHub</span>
               </a>
