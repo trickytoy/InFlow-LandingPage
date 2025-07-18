@@ -19,6 +19,15 @@ import {
   Lock,
 } from "lucide-react"
 
+// Add Supabase imports
+import { createClient } from '@supabase/supabase-js'
+
+// Initialize Supabase client
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
+
 export default function InflowLanding() {
   const [email, setEmail] = useState("")
   const [isSubmitted, setIsSubmitted] = useState(false)
@@ -28,12 +37,28 @@ export default function InflowLanding() {
     e.preventDefault()
     setIsLoading(true)
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    setIsSubmitted(true)
-    setIsLoading(false)
-    setEmail("")
+    try {
+      // Insert email into Supabase
+      const { data, error } = await supabase
+        .from('Waitlist')
+        .insert([{ Email: email }])
+      
+      if (error) {
+        if (error.code === '23505') { // Unique constraint violation
+          alert('This email is already on the waitlist!')
+        } else {
+          alert('Something went wrong. Please try again.')
+        }
+      } else {
+        setIsSubmitted(true)
+        setEmail("")
+      }
+    } catch (error) {
+      console.error('Unexpected error:', error)
+      alert('Something went wrong. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
