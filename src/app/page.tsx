@@ -1,7 +1,5 @@
 "use client"
-
 import type React from "react"
-
 import { useState } from "react"
 import {
   Activity,
@@ -17,48 +15,60 @@ import {
   Timer,
   BarChart3,
   Lock,
+  AlertCircle,
+  X,
 } from "lucide-react"
 
 // Add Supabase imports
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from "@supabase/supabase-js"
 
 // Initialize Supabase client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
 
 export default function InflowLanding() {
   const [email, setEmail] = useState("")
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleWaitlistSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError(null) // Clear any previous errors
 
     try {
       // Insert email into Supabase
-      const { data, error } = await supabase
-        .from('Waitlist')
-        .insert([{ Email: email }])
-      
+      const { data, error } = await supabase.from("Waitlist").insert([{ Email: email }])
+
       if (error) {
-        if (error.code === '23505') { // Unique constraint violation
-          alert('This email is already on the waitlist!')
+        if (error.code === "23505") {
+          // Unique constraint violation
+          setError("This email is already on the waitlist!")
         } else {
-          alert('Something went wrong. Please try again.')
+          setError("Something went wrong. Please try again.")
         }
       } else {
         setIsSubmitted(true)
         setEmail("")
       }
     } catch (error) {
-      console.error('Unexpected error:', error)
-      alert('Something went wrong. Please try again.')
+      console.error("Unexpected error:", error)
+      setError("Something went wrong. Please try again.")
     } finally {
       setIsLoading(false)
     }
+  }
+
+  // Function to scroll to the waitlist form
+  const scrollToWaitlist = () => {
+    const waitlistForm = document.getElementById("waitlist-form")
+    if (waitlistForm) {
+      waitlistForm.scrollIntoView({ behavior: "smooth", block: "start" })
+    }
+  }
+
+  const clearError = () => {
+    setError(null)
   }
 
   return (
@@ -82,7 +92,10 @@ export default function InflowLanding() {
               <Github className="w-4 h-4" />
               <span className="font-medium">GitHub</span>
             </a>
-            <button className="px-6 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-medium rounded-lg hover:from-indigo-600 hover:to-purple-600 transition-all shadow-lg hover:shadow-xl">
+            <button
+              onClick={scrollToWaitlist} // Added onClick handler
+              className="px-6  cursor-pointer py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-medium rounded-lg hover:from-indigo-600 hover:to-purple-600 transition-all shadow-lg hover:shadow-xl"
+            >
               Join Waitlist
             </button>
           </div>
@@ -94,18 +107,16 @@ export default function InflowLanding() {
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <div className="inline-flex items-center space-x-2 px-4 py-2 bg-indigo-50 border border-indigo-200 rounded-full text-indigo-700 font-medium mb-8">
+              <div  id="waitlist-form" className="inline-flex items-center space-x-2 px-4 py-2 bg-indigo-50 border border-indigo-200 rounded-full text-indigo-700 font-medium mb-8">
                 <Sparkles className="w-4 h-4" />
                 <span>AI-Powered Focus Assistant</span>
               </div>
-
               <h1 className="text-6xl md:text-7xl font-bold text-gray-900 mb-8 leading-tight">
                 Stay Focused. <br />
                 <span className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
                   Stay InFlow.
                 </span>
               </h1>
-
               <p className="text-xl text-gray-600 mb-12 leading-relaxed">
                 Inflow is the AI-powered Chrome extension that keeps your mind exactly where it needs to be. Focus isn't
                 a discipline problem it's an environment problem.
@@ -114,24 +125,39 @@ export default function InflowLanding() {
               {/* Waitlist Form */}
               <div className="mb-12">
                 {!isSubmitted ? (
-                  <form onSubmit={handleWaitlistSubmit} className="flex gap-3">
-                    <input
-                      type="email"
-                      placeholder="Enter your email address"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="flex-1 px-6 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 placeholder-gray-500 bg-white shadow-sm"
-                    />
-                    <button
-                      type="submit"
-                      disabled={isLoading}
-                      className="px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-600 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 flex items-center space-x-2"
-                    >
-                      <span>{isLoading ? "Joining..." : "Join Waitlist"}</span>
-                      <ArrowRight className="w-5 h-5" />
-                    </button>
-                  </form>
+                  <div className="space-y-4">
+                    <form onSubmit={handleWaitlistSubmit} className="flex gap-3">
+                      <input
+                        type="email"
+                        placeholder="Enter your email address"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        className="flex-1 px-6 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 placeholder-gray-500 bg-white shadow-sm"
+                      />
+                      <button
+                        type="submit"
+                        disabled={isLoading}
+                        className="px-8 cursor-pointer py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-600 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 flex items-center space-x-2"
+                      >
+                        <span>{isLoading ? "Joining..." : "Join Waitlist"}</span>
+                        <ArrowRight className="w-5 h-5" />
+                      </button>
+                    </form>
+
+                    {/* Error Message */}
+                    {error && (
+                      <div className="flex items-center justify-between bg-red-50 border border-red-200 p-4 rounded-xl text-red-700">
+                        <div className="flex items-center space-x-3">
+                          <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                          <span className="font-medium">{error}</span>
+                        </div>
+                        <button onClick={clearError} className="text-red-500 hover:text-red-700 transition-colors">
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 ) : (
                   <div className="flex items-center justify-center space-x-3 bg-green-50 border border-green-200 p-6 rounded-xl text-green-700">
                     <CheckCircle className="w-6 h-6" />
@@ -155,7 +181,6 @@ export default function InflowLanding() {
                 </div>
               </div>
             </div>
-
             {/* Hero Image */}
             <div className="relative">
               <div className="relative z-10">
@@ -182,7 +207,6 @@ export default function InflowLanding() {
             Traditional website blockers are too rigid. Everything's either blocked or open, no in-between. But what if
             your browser actually understood what you're working on and nudged you gently when you started to drift?
           </p>
-
           {/* Block Screen Image */}
           <div className="max-w-2xl mx-auto">
             <img
@@ -201,7 +225,6 @@ export default function InflowLanding() {
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Your Cognitive Wingman</h2>
             <p className="text-xl text-gray-600">Inflow isn't just a blocker, it's an intelligent focus assistant</p>
           </div>
-
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
             {[
               {
@@ -257,7 +280,6 @@ export default function InflowLanding() {
               </div>
             ))}
           </div>
-
           {/* Timer Interface Image */}
           <div className="text-center">
             <img
@@ -276,7 +298,6 @@ export default function InflowLanding() {
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">How Inflow Works</h2>
             <p className="text-xl text-gray-600">Simple setup, intelligent results</p>
           </div>
-
           <div className="space-y-16">
             {[
               {
@@ -321,7 +342,6 @@ export default function InflowLanding() {
           <p className="text-xl text-gray-600 mb-16 max-w-2xl mx-auto">
             Get detailed insights into your focus patterns with beautiful visualizations and session history
           </p>
-
           <div className="relative">
             <img
               src="/images/dashboard-sessions.png"
@@ -340,7 +360,6 @@ export default function InflowLanding() {
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Built with Modern Tech</h2>
             <p className="text-xl text-gray-600">Cutting-edge AI that runs entirely in your browser</p>
           </div>
-
           <div className="grid md:grid-cols-2 gap-8">
             <div className="p-8 bg-white rounded-2xl shadow-sm border border-gray-100">
               <div className="flex items-center space-x-3 mb-6">
@@ -362,7 +381,6 @@ export default function InflowLanding() {
                 ))}
               </div>
             </div>
-
             <div className="p-8 bg-white rounded-2xl shadow-sm border border-gray-100">
               <div className="flex items-center space-x-3 mb-6">
                 <Chrome className="w-6 h-6 text-green-600" />
@@ -394,9 +412,8 @@ export default function InflowLanding() {
           <p className="text-xl mb-12 opacity-90 max-w-2xl mx-auto">
             Join the Waitlist to be notified when Inflow launches on the Chrome Web Store
           </p>
-
           {!isSubmitted ? (
-            <div className="max-w-lg mx-auto">
+            <div className="max-w-lg mx-auto space-y-4">
               <form onSubmit={handleWaitlistSubmit} className="flex gap-3">
                 <input
                   type="email"
@@ -409,11 +426,24 @@ export default function InflowLanding() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="px-8 py-4 bg-white text-indigo-600 font-semibold rounded-xl hover:bg-gray-50 transition-all shadow-lg hover:shadow-xl"
+                  className="px-8 py-4 cursor-pointer bg-white text-indigo-600 font-semibold rounded-xl hover:bg-gray-50 transition-all shadow-lg hover:shadow-xl"
                 >
                   {isLoading ? "Joining..." : "Join Waitlist"}
                 </button>
               </form>
+
+              {/* Error Message for CTA Section */}
+              {error && (
+                <div className="flex items-center justify-between bg-red-500/20 border border-red-400/30 p-4 rounded-xl text-red-100 backdrop-blur-sm">
+                  <div className="flex items-center space-x-3">
+                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                    <span className="font-medium">{error}</span>
+                  </div>
+                  <button onClick={clearError} className="text-red-200 hover:text-white transition-colors">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <div className="flex items-center justify-center space-x-3 bg-white/10 backdrop-blur-sm p-6 rounded-xl max-w-lg mx-auto">
@@ -429,23 +459,24 @@ export default function InflowLanding() {
         <div className="max-w-5xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center mb-12">
             <div className="flex items-center space-x-3 mb-6 md:mb-0">
-              <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-10 h-10 bg-[#8c52ff] rounded-xl flex items-center justify-center shadow-lg">
                 <Activity className="w-6 h-6 text-white" />
               </div>
               <span className="text-2xl font-bold">Inflow</span>
             </div>
-
             <div className="flex items-center space-x-8">
-              <span className="text-gray-400">© 2024 Inflow. All rights reserved.</span>
-              <a href="https://github.com/trickytoy/InFlow" className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors">
+              <span className="text-gray-400">© 2025 Inflow. All rights reserved.</span>
+              <a
+                href="https://github.com/trickytoy/InFlow"
+                className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors"
+              >
                 <Github className="w-5 h-5" />
                 <span>GitHub</span>
               </a>
             </div>
           </div>
-
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
-            <p className="text-lg font-medium mb-2">🧠 Inflow - Stay Focused. Stay Inflow.</p>
+            <p className="text-lg font-medium mb-2"> Inflow - Stay Focused. Stay Inflow.</p>
             <p>Privacy-first AI that helps you maintain focus without compromising your data.</p>
           </div>
         </div>
