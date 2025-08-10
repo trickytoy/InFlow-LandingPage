@@ -1,6 +1,5 @@
 "use client"
 import type React from "react"
-import { useState } from "react"
 import {
   Activity,
   Shield,
@@ -9,67 +8,23 @@ import {
   Settings,
   Chrome,
   Github,
-  CheckCircle,
   ArrowRight,
   Sparkles,
   Timer,
   BarChart3,
   Lock,
-  AlertCircle,
-  X,
+  Download,
 } from "lucide-react"
 
 // Add Supabase imports
-import { createClient } from "@supabase/supabase-js"
 
 // Initialize Supabase client
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
-
 export default function InflowLanding() {
-  const [email, setEmail] = useState("")
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  const handleWaitlistSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError(null) // Clear any previous errors
-
-    try {
-      // Insert email into Supabase
-      const { data, error } = await supabase.from("Waitlist").insert([{ Email: email }])
-
-      if (error) {
-        if (error.code === "23505") {
-          // Unique constraint violation
-          setError("This email is already on the waitlist!")
-        } else {
-          setError("Something went wrong. Please try again.")
-        }
-      } else {
-        setIsSubmitted(true)
-        setEmail("")
-      }
-    } catch (error) {
-      console.error("Unexpected error:", error)
-      setError("Something went wrong. Please try again.")
-    } finally {
-      setIsLoading(false)
-    }
-  }
 
   // Function to scroll to the waitlist form
-  const scrollToWaitlist = () => {
-    const waitlistForm = document.getElementById("waitlist-form")
-    if (waitlistForm) {
-      waitlistForm.scrollIntoView({ behavior: "smooth", block: "start" })
-    }
-  }
 
-  const clearError = () => {
-    setError(null)
-  }
+  
+  const chromeStoreUrl = "https://chromewebstore.google.com/detail/Inflow:%20AI%20Website%20Blocker%20%26%20Focus%20Productivity%20Tool/pidhllckogbnnigclblflfjfkjjohhif"
 
   return (
     <div className="min-h-screen bg-white">
@@ -92,12 +47,15 @@ export default function InflowLanding() {
               <Github className="w-4 h-4" />
               <span className="font-medium">GitHub</span>
             </a>
-            <button
-              onClick={scrollToWaitlist} // Added onClick handler
-              className="px-6  cursor-pointer py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-medium rounded-lg hover:from-indigo-600 hover:to-purple-600 transition-all shadow-lg hover:shadow-xl"
+            <a
+              href={chromeStoreUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-6 cursor-pointer py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-medium rounded-lg hover:from-indigo-600 hover:to-purple-600 transition-all shadow-lg hover:shadow-xl flex items-center space-x-2"
             >
-              Join Waitlist
-            </button>
+              <Download className="w-4 h-4" />
+              <span>Download</span>
+            </a>
           </div>
         </div>
       </header>
@@ -124,47 +82,19 @@ export default function InflowLanding() {
 
               {/* Waitlist Form */}
               <div className="mb-12">
-                {!isSubmitted ? (
-                  <div className="space-y-4">
-                    <form onSubmit={handleWaitlistSubmit} className="flex gap-3">
-                      <input
-                        type="email"
-                        placeholder="Enter your email address"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        className="flex-1 px-6 py-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-gray-900 placeholder-gray-500 bg-white shadow-sm"
-                      />
-                      <button
-                        type="submit"
-                        disabled={isLoading}
-                        className="px-8 cursor-pointer py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-600 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 flex items-center space-x-2"
-                      >
-                        <span>{isLoading ? "Joining..." : "Join Waitlist"}</span>
-                        <ArrowRight className="w-5 h-5" />
-                      </button>
-                    </form>
-
-                    {/* Error Message */}
-                    {error && (
-                      <div className="flex items-center justify-between bg-red-50 border border-red-200 p-4 rounded-xl text-red-700">
-                        <div className="flex items-center space-x-3">
-                          <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                          <span className="font-medium">{error}</span>
-                        </div>
-                        <button onClick={clearError} className="text-red-500 hover:text-red-700 transition-colors">
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center space-x-3 bg-green-50 border border-green-200 p-6 rounded-xl text-green-700">
-                    <CheckCircle className="w-6 h-6" />
-                    <span className="font-medium">You're on the Waitlist! We'll notify you when Inflow launches.</span>
-                  </div>
-                )}
+                <a
+                  href={chromeStoreUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center space-x-3 px-8 py-4 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-xl hover:from-indigo-600 hover:to-purple-600 transition-all shadow-lg hover:shadow-xl text-lg"
+                >
+                  <Chrome className="w-6 h-6" />
+                  <span>Add to Chrome - It's Free</span>
+                  <ArrowRight className="w-5 h-5" />
+                </a>
+                <p className="text-sm text-gray-500 mt-3 ml-1">Available now on the Chrome Web Store</p>
               </div>
+
 
               <div className="flex items-center space-x-8 text-gray-500">
                 <div className="flex items-center space-x-2">
@@ -406,53 +336,6 @@ export default function InflowLanding() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600">
-        <div className="max-w-5xl mx-auto text-center text-white">
-          <h2 className="text-4xl md:text-5xl font-bold mb-8">Ready to Transform Your Focus?</h2>
-          <p className="text-xl mb-12 opacity-90 max-w-2xl mx-auto">
-            Join the Waitlist to be notified when Inflow launches on the Chrome Web Store
-          </p>
-          {!isSubmitted ? (
-            <div className="max-w-lg mx-auto space-y-4">
-              <form onSubmit={handleWaitlistSubmit} className="flex gap-3">
-                <input
-                  type="email"
-                  placeholder="Enter your email address"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="flex-1 px-6 py-4 bg-white/10 border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-white/50 text-white placeholder-white/60 backdrop-blur-sm"
-                />
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="px-8 py-4 cursor-pointer bg-white text-indigo-600 font-semibold rounded-xl hover:bg-gray-50 transition-all shadow-lg hover:shadow-xl"
-                >
-                  {isLoading ? "Joining..." : "Join Waitlist"}
-                </button>
-              </form>
-
-              {/* Error Message for CTA Section */}
-              {error && (
-                <div className="flex items-center justify-between bg-red-500/20 border border-red-400/30 p-4 rounded-xl text-red-100 backdrop-blur-sm">
-                  <div className="flex items-center space-x-3">
-                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                    <span className="font-medium">{error}</span>
-                  </div>
-                  <button onClick={clearError} className="text-red-200 hover:text-white transition-colors">
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="flex items-center justify-center space-x-3 bg-white/10 backdrop-blur-sm p-6 rounded-xl max-w-lg mx-auto">
-              <CheckCircle className="w-6 h-6" />
-              <span className="font-medium">You're on the Waitlist!</span>
-            </div>
-          )}
-        </div>
-      </section>
 
       {/* Footer */}
       <footer className="py-16 px-6 bg-gray-900 text-white">
