@@ -81,7 +81,7 @@ export default function InflowLanding() {
               </p>
 
               {/* Waitlist Form */}
-              <div className="mb-12">
+              <div className="mb-4">
                 <a
                   href={chromeStoreUrl}
                   target="_blank"
@@ -94,7 +94,20 @@ export default function InflowLanding() {
                 </a>
                 <p className="text-sm text-gray-500 mt-3 ml-1">Available now on the Chrome Web Store</p>
               </div>
-
+              <div className="mb-4">
+                <a
+                  href="https://www.producthunt.com/products/inflow?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-inflow-2"
+                  target="_blank"
+                >
+                  <img
+                    src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1003684&theme=light&t=1755163319654"
+                    alt="InFlow - End Mindless Browsing and Procrastinating | Product Hunt"
+                    style={{ width: "250px", height: "54px" }}
+                    width={250}
+                    height={54}
+                  />
+                </a>
+              </div>
 
               <div className="flex items-center space-x-8 text-gray-500">
                 <div className="flex items-center space-x-2">
